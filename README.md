@@ -5,7 +5,11 @@
 A simple script that sets up an HTTP Proxy Server
 
 ```
-sudo apt-get update
+sudo su
+```
+
+```
+apt-get update
 ```
 
 ```
