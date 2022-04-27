@@ -17,5 +17,5 @@ apt-get install curl -y
 ```
 
 ```
-bash <(curl -s "https://raw.githubusercontent.com/amarxyadav/squid_proxy/main/squid_setup.sh")
+bash <(curl -s "https://raw.githubusercontent.com/amarxyadav/squid_proxy/main/setup.sh")
 ```
