@@ -44,15 +44,16 @@ touch /etc/squid/passwords
 htpasswd -ib /etc/squid/passwords $username $password
 
 # Squid configuration
-cat <<EOT >> /etc/squid/squid.conf
+cat <<EOT > /etc/squid/squid.conf
 #Auth
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
 acl ncsa_users proxy_auth REQUIRED
+
 #Recommended minimum configuration:
 dns_v4_first on
 acl manager proto cache_object
 acl localhost src 127.0.0.1/32
-acl to_localhost dst 127.0.0.0/8 # systemctl status squid.service after installation squid by this script
+acl to_localhost dst 127.0.0.0/8 # systemctl status squid.service after installation squid and danted by this script
                                  # WARNING: because of this '127.0.0.0/8' is ignored to keep splay tree searching predictable
                                  # WARNING: You should probably remove '127.0.0.0/8' from the ACL named 'to_localhost'
 acl localnet src 0.0.0.0/8 192.168.100.0/24 192.168.101.0/24
@@ -67,17 +68,23 @@ acl Safe_ports port 280        # http-mgmt
 acl Safe_ports port 488        # gss-http
 acl Safe_ports port 591        # filemaker
 acl Safe_ports port 777        # multiling http
+
 acl CONNECT method CONNECT
+
 http_access allow manager localhost
 http_access deny manager
 http_access deny !Safe_ports
+
 http_access deny to_localhost
 icp_access deny all
 htcp_access deny all
-http_port 8080
+
+http_port 9099
 hierarchy_stoplist cgi-bin ? # systemctl status squid.service after installation squid and danted by this script
                              # ERROR: Directive 'hierarchy_stoplist' is obsolete.
 access_log /var/log/squid/access.log squid
+
+
 #Suggested default:
 refresh_pattern ^ftp:        1440    20%    10080
 refresh_pattern ^gopher:    1440    0%    1440
@@ -85,18 +92,19 @@ refresh_pattern -i (/cgi-bin/|\?) 0 0% 0
 refresh_pattern .        0    20%    4320
 # Leave coredumps in the first cache dir
 coredump_dir /var/spool/squid
+
 # Allow all machines to all sites
 http_access allow ncsa_users
 #http_access allow all
+
 #Headers
 via off
 forwarded_for off
 follow_x_forwarded_for deny all
 request_header_access X-Forwarded-For deny all
-header_access X_Forwarded_For deny all          # systemctl status squid.service after installation squid by this script
+header_access X_Forwarded_For deny all          # systemctl status squid.service after installation squid and danted by this script
                                                 # ERROR: Directive 'header_access' is obsolete.
 EOT
-
 systemctl restart squid.service
 
 
