@@ -44,7 +44,7 @@ touch /etc/squid/passwords
 htpasswd -ib /etc/squid/passwords $username $password
 
 # Squid configuration
-cat << EOT > /etc/squid/squid.conf
+cat <<EOT >> /etc/squid/squid.conf
 #Auth
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
 acl ncsa_users proxy_auth REQUIRED
@@ -96,6 +96,7 @@ request_header_access X-Forwarded-For deny all
 header_access X_Forwarded_For deny all          # systemctl status squid.service after installation squid by this script
                                                 # ERROR: Directive 'header_access' is obsolete.
 EOT
+
 systemctl restart squid.service
 
 
