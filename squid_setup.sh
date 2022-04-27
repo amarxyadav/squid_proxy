@@ -44,7 +44,7 @@ touch /etc/squid/passwords
 htpasswd -ib /etc/squid/passwords $username $password
 
 # Squid configuration
-cat <<EOT > /etc/squid/squid.conf
+cat << EOT > /etc/squid/squid.conf
 #Auth
 auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwords
 acl ncsa_users proxy_auth REQUIRED
