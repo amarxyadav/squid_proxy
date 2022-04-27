@@ -28,8 +28,16 @@ while [[ $password = "" ]]; do
     fi
 done
 
-# Install squid3, wget and apache2-utils for htpasswd
-apt-get install squid3 wget apache2-utils -y
+# Install squid3, dante-server, wget and apache2-utils for htpasswd
+apt-get install squid3 wget dante-server apache2-utils -y
+
+# determine default int
+default_int="$(ip route list |grep default |grep -o -P '\b[a-z]+\d+\b')" #Because net-tools in debian, ubuntu are obsolete already
+# determine external ip
+external_ip="$(wget ipinfo.io/ip -q -O -)"
+
+# create system user for dante
+useradd --shell /usr/sbin/nologin $username && echo "$username:$password" | chpasswd
 
 # add user for squid
 # avoid rewrite users
@@ -101,10 +109,35 @@ header_access X_Forwarded_For deny all          # systemctl status squid.service
 EOT
 systemctl restart squid.service
 
+# dante conf
+cat <<EOT > /etc/danted.conf
+logoutput: /var/log/socks.log
+internal: 0.0.0.0 port = 1080
+external: $default_int
+socksmethod: username
+clientmethod: none
+user.privileged: root
+user.notprivileged: nobody
+user.libwrap: nobody
+client pass {
+        from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
+        log: connect disconnect error
+}
+socks pass {
+        from: 0.0.0.0/0 to: 0.0.0.0/0
+        protocol: tcp udp
+}
+EOT
+# And we have a little bit problem with this message from `systemctl status danted.service`
+#               danted.service: Failed to read PID from file /var/run/danted.pid: Invalid argument
+systemctl restart danted.service
+
 #information
 echo "--------------------------------------------------------------------------------------------------"
 echo "--------------------------------------------------------------------------------------------------"
 echo "--------------------------------------------------------------------------------------------------"
+echo "Proxy IP: $external_ip"
 echo "HTTP port: 8080"
+echo "SOCKS5 port: 1080"
 echo "Username: $username"
 echo "Password: $password"
