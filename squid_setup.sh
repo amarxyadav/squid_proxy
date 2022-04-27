@@ -36,7 +36,6 @@ default_int="$(ip route list |grep default |grep -o -P '\b[a-z]+\d+\b')" #Becaus
 # determine external ip
 external_ip="$(wget ipinfo.io/ip -q -O -)"
 
-
 # add user for squid
 # avoid rewrite users
 touch /etc/squid/passwords
@@ -79,7 +78,7 @@ http_access deny to_localhost
 icp_access deny all
 htcp_access deny all
 
-http_port 9099
+http_port 8080
 hierarchy_stoplist cgi-bin ? # systemctl status squid.service after installation squid and danted by this script
                              # ERROR: Directive 'hierarchy_stoplist' is obsolete.
 access_log /var/log/squid/access.log squid
@@ -107,6 +106,28 @@ header_access X_Forwarded_For deny all          # systemctl status squid.service
 EOT
 systemctl restart squid.service
 
+# dante conf
+cat <<EOT > /etc/danted.conf
+logoutput: /var/log/socks.log
+internal: 0.0.0.0 port = 9098
+external: $default_int
+socksmethod: username
+clientmethod: none
+user.privileged: root
+user.notprivileged: nobody
+user.libwrap: nobody
+client pass {
+        from: 0.0.0.0/0 port 1-65535 to: 0.0.0.0/0
+        log: connect disconnect error
+}
+socks pass {
+        from: 0.0.0.0/0 to: 0.0.0.0/0
+        protocol: tcp udp
+}
+EOT
+# And we have a little bit problem with this message from `systemctl status danted.service`
+#               danted.service: Failed to read PID from file /var/run/danted.pid: Invalid argument
+systemctl restart danted.service
 
 #information
 echo "--------------------------------------------------------------------------------------------------"
