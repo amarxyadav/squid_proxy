@@ -2,7 +2,7 @@
 
 # How to Setup
 
-A simple script that sets up an HTTP Proxy Server
+A simple script that sets up an HTTP Proxy Server  & SOCKS5 PROXY
 
 HTTP PROXY
 
