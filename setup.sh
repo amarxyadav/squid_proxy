@@ -29,7 +29,7 @@ while [[ $password = "" ]]; do
 done
 
 # Install squid3, wget and apache2-utils for htpasswd
-yum install squid wget httpd-tools
+apt install squid3 wget apache2-utils
 
 # determine default int
 default_int="$(ip route list |grep default |grep -o -P '\b[a-z]+\d+\b')" #Because net-tools in debian, ubuntu are obsolete already
