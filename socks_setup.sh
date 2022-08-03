@@ -42,7 +42,7 @@ useradd --shell /usr/sbin/nologin $username && echo "$username:$password" | chpa
 # dante conf
 cat <<EOT > /etc/danted.conf
 logoutput: /var/log/socks.log
-internal: 0.0.0.0 port = 8080
+internal: 0.0.0.0 port = 1080
 external: $default_int
 socksmethod: username
 clientmethod: none
@@ -67,6 +67,6 @@ echo "--------------------------------------------------------------------------
 echo "--------------------------------------------------------------------------------------------------"
 echo "--------------------------------------------------------------------------------------------------"
 echo "Proxy IP: $external_ip"
-echo "SOCKS5 port: 8080"
+echo "SOCKS5 port: 1080"
 echo "Username: $username"
 echo "Password: $password"
